@@ -16,4 +16,12 @@ export const environment = {
   file: {
     messages: 'messages.json',
   },
+  reCaptcha: {
+    siteKey: '6LfS788ZAAAAADw9r_wXdSX5DsnDaVohNOaGz2LV',
+    secretKey: '6LfS788ZAAAAAAjUFePzrKgyAHi4QwEr4IG_E3i0',
+  },
+  http: {
+    timeout: 5000,
+    maxRedirects: 5,
+  },
 };

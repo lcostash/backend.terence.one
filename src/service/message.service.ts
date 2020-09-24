@@ -9,6 +9,20 @@ import { environment } from '../environment';
 export class MessageService {
   /**
    * @since 0.0.1
+   * @return Promise<AjaxResponseInterface>
+   */
+  public async fetchMessages(): Promise<AjaxResponseInterface> {
+    // get the list of existing messages
+    const rows = await MessageService.getMessages(true);
+
+    return {
+      status: HttpStatus.OK,
+      rows: rows,
+    };
+  }
+
+  /**
+   * @since 0.0.1
    * @param data MessageInterface
    * @return Promise<AjaxResponseInterface>
    */
