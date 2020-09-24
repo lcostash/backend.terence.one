@@ -40,9 +40,7 @@ export class MessageService {
 
     // validate the income data
     await validate(message).then((errors: ValidationError[]) => {
-      if (errors.length > 0) {
-        throw new BadRequestException(errors);
-      }
+      if (errors.length > 0) throw new BadRequestException(errors);
     });
 
     // save the income data

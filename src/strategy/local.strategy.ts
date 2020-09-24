@@ -5,6 +5,7 @@ import { registerSchema, validate } from 'class-validator';
 import { AuthService } from '../service';
 import { LocalValidation } from '../validation';
 import { ValidationError } from 'class-validator/types/validation/ValidationError';
+import { UserInterface } from '../interface';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -20,18 +21,20 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
    * @since 0.0.1
    * @param username string
    * @param password string
+   * @return Promise<any>
    */
   async validate(username: string, password: string): Promise<any> {
     const body = { username: username, password: password };
     await validate('LocalValidationSchema', body).then((errors: ValidationError[]) => {
-      if (errors.length > 0) {
-        throw new BadRequestException(errors);
-      }
+      if (errors.length > 0) throw new BadRequestException(errors);
     });
-    const user = await this.authService.validate(username, password);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return user;
+    let user: UserInterface = null;
+    await this.authService.checkAuth(username, password)
+      .then((foundUser: UserInterface) => user = foundUser)
+      .catch(() => {
+        throw new UnauthorizedException();
+      });
+
+    return new Promise((resolve) => resolve(user));
   }
 }

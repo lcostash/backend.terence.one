@@ -19,8 +19,8 @@ async function bootstrap() {
     methods: 'GET,OPTIONS,POST,PUT,PATCH,DELETE',
     optionsSuccessStatus: 200,
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Content-Language', 'X-AUTH-TOKEN', 'Cache-Control', 'Pragma', 'Expires'],
-    exposedHeaders: ['Link'],
+    allowedHeaders: ['Content-Type', 'Content-Language', 'Authorization', 'Cache-Control', 'Pragma', 'Expires'],
+    exposedHeaders: ['x-auth-token'],
     maxAge: 3600,
   });
   app.setGlobalPrefix('api');

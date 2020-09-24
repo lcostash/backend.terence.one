@@ -4,4 +4,5 @@ export declare interface UserInterface {
   lastName: string;
   username: string;
   password: string;
+  role: number;
 }

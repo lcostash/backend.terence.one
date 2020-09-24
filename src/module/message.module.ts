@@ -16,7 +16,10 @@ import { JwtStrategy } from '../strategy';
       signOptions: { expiresIn: environment.jwt.expiresIn },
     }),
   ],
-  providers: [MessageService, JwtStrategy],
+  providers: [
+    MessageService,
+    JwtStrategy,
+  ],
   controllers: [MessageController],
   exports: [MessageService],
 })

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserInterface } from '../interface';
+import { PayloadInterface, UserInterface } from '../interface';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class AuthService {
       lastName: 'Costas',
       username: 'lcostash@gmail.com',
       password: 'Qq123456_',
+      role: 1,
     },
   ];
 
@@ -26,27 +27,14 @@ export class AuthService {
    * @param password string
    * @return Promise<UserInterface | null>
    */
-  public async validate(username: string, password: string): Promise<UserInterface | null> {
-    return new Promise((resolve) => {
-      const users: UserInterface[] = this.users.filter((u: UserInterface) => u.username === username);
-      if (!users || users.length === 0 || users[0]) resolve(null);
-      this.isPasswordValid(users[0].password, password).catch(() => resolve(null));
-      resolve(users[0]);
-    });
-  }
-
-  /**
-   * @since 0.0.1
-   * @param a string
-   * @param b string
-   * @return Promise<any>
-   */
-  private async isPasswordValid(a, b): Promise<any> {
+  public async checkAuth(username: string, password: string): Promise<UserInterface | null> {
     return new Promise((resolve, reject) => {
-      const result = typeof a === 'string' && typeof b === 'string'
-        ? a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0
-        : a === b;
-      result ? resolve() : reject();
+      const users: UserInterface[] = this.users.filter((u: UserInterface) => u.username === username);
+      if (!users || users.length < 1) reject(null);
+      const isPasswordValid = typeof users[0].password === 'string' && typeof password === 'string'
+        ? users[0].password.localeCompare(password, undefined, { sensitivity: 'accent' }) === 0
+        : users[0].password === password;
+      isPasswordValid ? resolve(users[0]) : reject(null);
     });
   }
 
@@ -56,10 +44,37 @@ export class AuthService {
    * @return Promise<any>
    */
   async signIn(user: UserInterface): Promise<any> {
-    return {
-      token: this.jwtService.sign({
-        uuid: user.uuid,
-      }),
-    };
+    return new Promise((resolve) => {
+      resolve({
+        token: this.jwtService.sign({ uuid: user.uuid }),
+        profile: {
+          uuid: user.uuid,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+        },
+      });
+    });
+  }
+
+  /**
+   * @since 0.0.1
+   * @param payload PayloadInterface
+   * @return Promise<any>
+   */
+  async checkMe(payload: PayloadInterface): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const users: UserInterface[] = this.users.filter((u: UserInterface) => u.uuid === payload.uuid);
+      if (!users || users.length < 1) reject(null);
+      resolve({
+        token: this.jwtService.sign({ uuid: users[0].uuid }),
+        profile: {
+          uuid: users[0].uuid,
+          firstName: users[0].firstName,
+          lastName: users[0].lastName,
+          role: users[0].role,
+        },
+      });
+    });
   }
 }
